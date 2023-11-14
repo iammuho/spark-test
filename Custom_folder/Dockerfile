@@ -8,4 +8,4 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Run the application
-CMD ["spark-submit", "./spark_app.py"]
+CMD ["/opt/spark/bin/spark-submit", "./spark_app.py"]
