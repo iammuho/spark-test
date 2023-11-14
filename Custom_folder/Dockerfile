@@ -1,23 +1,21 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8-slim
+FROM spark-with-s3-gcs AS spark-with-python
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+ENV PYTHONPATH=$SPARK_HOME/python/:$PYTHONPATH
 
-# Install Java and procps
-RUN apt-get update && apt-get install -y \
-    openjdk-11-jre-headless \
-    procps \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y \
+    && apt-get install -y python3 python3-pip \
+    && pip3 install --upgrade pip setuptools \
+    # Removed the .cache to save space
+    && rm -r /root/.cache && rm -rf /var/cache/apt/*
 
-# Set the JAVA_HOME environment variable
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
+WORKDIR /app
 
-# Copy the current directory contents into the container at /usr/src/app
-COPY . .
+# Add requirements file
+ADD requirements.txt .
+# Add application files
+ADD . .
+# Install application specific python dependencies
+RUN pip3 install -r requirements.txt
+USER root
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir pyspark
-
-# Run spark_app.py when the container launches
-CMD ["python", "./spark_app.py"]
+ENTRYPOINT [ "/opt/spark/entrypoint.sh" ]
