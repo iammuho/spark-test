@@ -11,6 +11,7 @@ def main():
 
     df = spark.createDataFrame(data).toDF(*columns)
     df.show()
+    
 
     spark.stop()
 
