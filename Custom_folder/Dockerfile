@@ -4,6 +4,15 @@ FROM python:3.8-slim
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
+# Install Java and procps
+RUN apt-get update && apt-get install -y \
+    openjdk-11-jre-headless \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the JAVA_HOME environment variable
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
+
 # Copy the current directory contents into the container at /usr/src/app
 COPY . .
 
